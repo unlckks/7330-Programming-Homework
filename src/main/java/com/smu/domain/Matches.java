@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -15,14 +16,14 @@ import java.time.LocalDateTime;
 @Data
 public class Matches {
 
-    private String hostID; // Assuming char(8) maps to a String in Java
-    private String guestID; // Assuming char(8) maps to a String in Java
-    private LocalDateTime start; // datetime maps to LocalDateTime
-    private LocalDateTime end; // datetime maps to LocalDateTime
-    private Integer hostWin; // tinyint(1) typically maps to int, but can also be boolean
-    private Integer preRatingHost; // int maps to int
-    private Integer preRatingGuest; // int maps to int
-    private Integer postRatingHost; // int maps to int
+    private String hostID;
+    private String guestID;
+    private LocalDateTime  start;
+    private LocalDateTime  end;
+    private Integer hostWin;
+    private Integer preRatingHost;
+    private Integer preRatingGuest;
+    private Integer postRatingHost;
     private Integer postRatingGuest;
 }
 

@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: MingYun
@@ -23,4 +25,6 @@ public class Player {
 
 
         private String state;
+
+
 }
