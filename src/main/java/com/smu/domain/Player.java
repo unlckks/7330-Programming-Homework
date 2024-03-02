@@ -16,11 +16,11 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Player {
-          // 8 digits
+
         private String id;
 
         private String name;
-         //
+
         private LocalDate birthdate;
 
 

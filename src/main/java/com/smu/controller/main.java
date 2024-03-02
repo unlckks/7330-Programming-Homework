@@ -119,9 +119,22 @@ public class main {
                     String ID = parts[1].trim();
                     service.selectWinList(ID);
                 }
-
+                break;
+            case "D":
+                if (parts.length == 3) {
+                    LocalDate startDate = LocalDate.parse(parts[1].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+                    LocalDate endDate = LocalDate.parse(parts[2].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+                    service.dateMatches(startDate, endDate);
+                }
+                break;
+            case "M":
+                if (parts.length == 2) {
+                    String ID = parts[1].trim();
+                    service.ListMatches(ID);
+                }
+                break;
             default:
-                System.out.println("please input correct command");
+                System.out.println("input invalid");
         }
     }
 
