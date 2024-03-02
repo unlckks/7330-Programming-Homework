@@ -1,5 +1,6 @@
 package com.smu.service;
 
+import com.smu.domain.Matches;
 import com.smu.domain.Player;
 import com.smu.util.JdbcUtils;
 import lombok.val;
@@ -72,6 +73,13 @@ public class Service  {
         preparedStatement.setString(4, player.getState());
         preparedStatement.executeUpdate();
         System.out.println("insert success");
+    }
+    public  void addMatches(Matches matches) throws SQLException {
+        Connection conn=null;
+        Statement st=null;
+        conn = JdbcUtils.getConnection();
+        String sql = "INSERT INTO MatchDetails (HostID, GuestID, Start, End, HostWin, PreRatingHost, PostRatingHost, PreRatingGuest, PostRatingGuest) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"；
+       PreparedStatement preparedStatement =  conn.prepareStatement(sql);
     }
 
 

@@ -1,6 +1,7 @@
 package com.smu.controller;
 
 
+import com.smu.domain.Matches;
 import com.smu.domain.Player;
 import com.smu.service.Service;
 import lombok.val;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 /**
@@ -55,19 +57,32 @@ public class main  {
                     break ;
                 case "r":
                     service.clearAllData();
+                    break ;
                 case "p":
-                    if( parts.length !=  0) {
+                    if(parts.length > 4 ){
                         Player player = new Player();
                         player.setId(parts[1].trim());
                         player.setName(parts[2].trim());
                         player.setBirthdate(Date.valueOf(parts[3].trim()).toLocalDate());
+                        player.setState(parts[4].trim());
                         service.addPlayer(player);
-                        System.out.println("insert success");
-                    }else{
-                        System.out.println("please input correct insert length");
+                        System.out.println("insert success!");
+                        break;
                     }
-
-                    break;
+                case "m" :
+                    if(parts.length == 9 ){
+                        Matches matches = new Matches();
+                        matches.setHostID(parts[1].trim());
+                        matches.setGuestID(parts[2].trim());
+                        matches.setStart(LocalDateTime.parse(parts[3].trim()));
+                        matches.setEnd(LocalDateTime.parse(parts[4].trim()));
+                        matches.setHostWin(Integer.parseInt(parts[5].trim())));
+                        matches.setPreRatingHost(Integer.valueOf(parts[6].trim()));
+                        matches.setPostRatingHost(Integer.valueOf(parts[7].trim()));
+                        matches.setPreRatingGuest(Integer.valueOf(parts[8].trim()));
+                        matches.setPostRatingGuest(Integer.valueOf(parts[9].trim()));
+                        service.addMatches(matches);
+                    }
 
                 default: System.out.println("please input correct command");
             }
