@@ -23,24 +23,23 @@ public class Service {
             st = conn.createStatement();
 
             String sqlPlayer = "CREATE TABLE IF NOT EXISTS Player (" +
-                    "ID CHAR(8) PRIMARY KEY NOT NULL," +
+                    "ID INT PRIMARY KEY," +
                     "Name VARCHAR(255) UNIQUE NOT NULL," +
                     "Birthdate DATE NOT NULL," +
-                    "State CHAR(2) NOT NULL);";
+                    "Rating INT,"+
+                    "State CHAR(2));";
             st.executeUpdate(sqlPlayer);
 
             String sqlMatches = "CREATE TABLE IF NOT EXISTS Matches (" +
-                    "HostID CHAR(8) NOT NULL," +
-                    "GuestID CHAR(8) NOT NULL," +
+                    "HostID INT," +
+                    "GuestID INT," +
                     "Start DATETIME NOT NULL," +
                     "End DATETIME," +
-                    "Hostwin BOOLEAN," +
+                    "HostWin BOOLEAN," +
                     "PreRatingHost INT," +
                     "PreRatingGuest INT," +
                     "PostRatingHost INT," +
-                    "PostRatingGuest INT," +
-                    "FOREIGN KEY (HostID) REFERENCES Player(ID)," +
-                    "FOREIGN KEY (GuestID) REFERENCES Player(ID));";
+                    "PostRatingGuest INT);";
             st.executeUpdate(sqlMatches);
 
             System.out.println("Checked and created tables if not exist.");
@@ -59,16 +58,11 @@ public class Service {
 
             st = conn.createStatement();
 
-            //set foreign key off
-            st.execute("SET foreign_key_checks = 0");
-
             String clearPlayer = "DELETE FROM Player";
             String clearMatches = "DELETE FROM Matches ";
 
             st.executeUpdate(clearPlayer);
             st.executeUpdate(clearMatches);
-            //set foreign key open
-            st.execute("SET foreign_key_checks = 1");
 
 
             System.out.println("clear all data success");
@@ -82,12 +76,13 @@ public class Service {
         Statement st = null;
         try {
             conn = JdbcUtils.getConnection();
-            String sql = "INSERT INTO Player (ID, Name, Birthdate, State) VALUES (?, ?, ?, ?);";
+            String sql = "INSERT INTO Player (ID, Name, Birthdate,Rating, State) VALUES (?, ?, ?, ?,?);";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setString(1, player.getId());
+            preparedStatement.setInt(1, player.getId());
             preparedStatement.setString(2, player.getName());
             preparedStatement.setDate(3, Date.valueOf(player.getBirthdate()));
-            preparedStatement.setString(4, player.getState());
+            preparedStatement.setInt(4,player.getRating());
+            preparedStatement.setString(5, player.getState());
             preparedStatement.executeUpdate();
             System.out.println("insert player success");
         } finally {
@@ -103,11 +98,11 @@ public class Service {
 
             String sql = "INSERT INTO Matches (HostID, GuestID, Start, End, HostWin, PreRatingHost, PostRatingHost, PreRatingGuest, PostRatingGuest) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setString(1, matches.getHostID());
-            preparedStatement.setString(2, matches.getGuestID());
+            preparedStatement.setInt(1, matches.getHostID());
+            preparedStatement.setInt(2, matches.getGuestID());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
             preparedStatement.setTimestamp(4, Timestamp.valueOf(matches.getEnd()));
-            preparedStatement.setInt(5, matches.getHostWin());
+            preparedStatement.setBoolean(5, matches.getHostWin());
             preparedStatement.setInt(6, matches.getPreRatingHost());
             preparedStatement.setInt(7, matches.getPostRatingHost());
             preparedStatement.setInt(8, matches.getPreRatingGuest());
@@ -127,8 +122,8 @@ public class Service {
             conn = JdbcUtils.getConnection();
             String sql = "INSERT INTO Matches (HostID, GuestID, start) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setString(1, matches.getHostID());
-            preparedStatement.setString(2, matches.getGuestID());
+            preparedStatement.setInt(1, matches.getHostID());
+            preparedStatement.setInt(2, matches.getGuestID());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
             preparedStatement.executeUpdate();
             System.out.println("add played information success");
@@ -145,15 +140,15 @@ public class Service {
 
         String sql = "UPDATE Matches SET GuestID = ?, start = ?, end = ?, HostWin = ?, PreRatingHost = ?, PostRatingHost = ?, PreRatingGuest = ?, PostRatingGuest = ? WHERE HostID = ? ";
         PreparedStatement preparedStatement = conn.prepareStatement(sql);
-        preparedStatement.setString(2, matches.getGuestID());
+        preparedStatement.setInt(2, matches.getGuestID());
         preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
         preparedStatement.setTimestamp(4, Timestamp.valueOf(matches.getStart()));
-        preparedStatement.setInt(5, matches.getHostWin());
-        preparedStatement.setInt(6, matches.getPreRatingHost());
+        preparedStatement.setBoolean(5, matches.getHostWin());
+        preparedStatement.setInt(6, matches.getPreRatingHost()) ;
         preparedStatement.setInt(7, matches.getPostRatingHost());
         preparedStatement.setInt(8, matches.getPreRatingGuest());
         preparedStatement.setInt(9, matches.getPostRatingGuest());
-        preparedStatement.setString(1, matches.getHostID());
+        preparedStatement.setInt(1, matches.getHostID());
         preparedStatement.executeUpdate();
         System.out.println("update Matches success");
     }
@@ -164,16 +159,17 @@ public class Service {
         try {
             conn = JdbcUtils.getConnection();
 
-            String sql = "SELECT ID, name, birthdate, state FROM Player WHERE ID = ?";
+            String sql = "SELECT ID, name, birthdate, rating, state FROM Player WHERE ID = ?";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, playerId);
             ResultSet resultSet = preparedStatement.executeQuery();
             Player player = new Player();
             if (resultSet.next()) {
-                player.setId(resultSet.getString("id"));
+                player.setId(resultSet.getInt("id"));
                 player.setName(resultSet.getString("name"));
                 LocalDate birthdate = resultSet.getDate("birthdate").toLocalDate();
                 player.setBirthdate(birthdate);
+                player.setRating(resultSet.getInt("rating"));
                 player.setState(resultSet.getString("state"));
             }
             return player;
@@ -192,7 +188,7 @@ public class Service {
                     "COALESCE(opponent.ID, 'No matches') AS OpponentID, " +
                     "COALESCE(opponent.Name, 'No opponents') AS OpponentName, " +
                     "SUM(CASE WHEN (p.ID = m.HostID AND m.Hostwin = TRUE) OR (p.ID = m.GuestID AND m.Hostwin = FALSE) THEN 1 ELSE 0 END) AS Wins, " +
-                    "SUM(CASE WHEN (p.ID = m.HostID AND m.Hostwin = FALSE) OR (p.ID = m.GuestID AND m.Hostwin = TRUE) THEN 1 ELSE 0 END) AS Losses " +
+                    "SUM(CASE WHEN (p.ID = m.HostID AND m.Hostwin = FALSE) OR (p.ID = m.GuestID AND m.Hostwin = TRUE) THEN 1 ELSE 0 END) AS Lost " +
                     "FROM Player p " +
                     "LEFT JOIN Matches m ON p.ID = m.HostID OR p.ID = m.GuestID " +
                     "LEFT JOIN Player opponent ON (p.ID = m.HostID AND opponent.ID = m.GuestID) OR (p.ID = m.GuestID AND opponent.ID = m.HostID) " +
@@ -209,9 +205,9 @@ public class Service {
                 String opponentId = resultSet.getString("OpponentID");
                 String opponentName = resultSet.getString("OpponentName");
                 int wins = resultSet.getInt("Wins");
-                int losses = resultSet.getInt("Losses");
-                System.out.println("Player ID: " + playerId + ", Name: " + playerName);
-                System.out.println("Opponent ID: " + opponentId + ", Opponent Name: " + opponentName + ", Wins: " + wins + ", Losses: " + losses);
+                int lost = resultSet.getInt("Lost");
+                System.out.println("Player ID: " + playerId + ", player Name: " + playerName);
+                System.out.println("Opponent Player ID: " + opponentId + ", Opponent Player Name: " + opponentName + ", Wins: " + wins + ", lost: " + lost);
             }
             return player;
         } finally {
@@ -224,19 +220,36 @@ public class Service {
         Statement st = null;
         try {
             conn = JdbcUtils.getConnection();
-            String sql = "SELECT start, end, HostID, GuestID, HostWin FROM `Matches` WHERE start >= ? AND end <= ? ORDER BY start ASC";
+            String sql = "SELECT " +
+                    "    m.start, " +
+                    "    m.end, " +
+                    "    h.Name AS HostName, " +
+                    "    g.Name AS GuestName, " +
+                    "    CASE " +
+                    "        WHEN m.Hostwin THEN 'H' " +
+                    "        ELSE 'G' " +
+                    "    END AS Winner " +
+                    "FROM " +
+                    "    `Matches` m " +
+                    "JOIN " +
+                    "    `Player` h ON m.HostID = h.ID " +
+                    "JOIN " +
+                    "    `Player` g ON m.GuestID = g.ID " +
+                    "WHERE " +
+                    "    m.start >= ? AND m.end <= ? " +
+                    "ORDER BY " +
+                    "    m.start ASC";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setDate(1, Date.valueOf(startDate));
             preparedStatement.setDate(2, Date.valueOf(endDate));
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                // Read the match details
                 String startTime = resultSet.getString("start");
                 String endTime = resultSet.getString("end");
-                String hostName = resultSet.getString("HostId");
-                String guestName = resultSet.getString("GuestId");
-                boolean hostWins = resultSet.getBoolean("HostWin");
-                System.out.println(startTime + ", " + endTime + ", " + hostName + ", " + guestName + ", " + (hostWins ? "H" : "G"));
+                String hostName = resultSet.getString("HostName");
+                String guestName = resultSet.getString("GuestName");
+                String  hostWins = resultSet.getString("Winner");
+                System.out.println(startTime + ", " + endTime + ", " + hostName + ", " + guestName + ", " + hostWins);
             }
         } finally {
             if (conn != null) conn.close();

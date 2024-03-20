@@ -56,12 +56,15 @@ public class main {
                 service.clearAllData();
                 break;
             case "p":
-                if (parts.length == 5) {
+                if (parts.length == 6) {
                     Player player = new Player();
-                    player.setId(parts[1].trim());
+                    Integer Id = Integer.valueOf(parts[1].trim());
+                    player.setId(Id);
                     player.setName(parts[2].trim());
                     player.setBirthdate(LocalDate.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd")));
-                    player.setState(parts[4].trim());
+                    Integer rating = Integer.valueOf(parts[4].trim());
+                    player.setRating(rating);
+                    player.setState(parts[5].trim());
                     service.addPlayer(player);
                 }
                 break;
@@ -69,11 +72,15 @@ public class main {
             case "m":
                 if (parts.length == 10) {
                     Matches matches = new Matches();
-                    matches.setHostID(parts[1].trim());
-                    matches.setGuestID(parts[2].trim());
+                    Integer HostId = Integer.valueOf(parts[1].trim());
+                    matches.setHostID(HostId);
+                    Integer GuestId = Integer.valueOf(parts[2].trim());
+                    matches.setGuestID(GuestId);
                     matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
                     matches.setEnd(LocalDateTime.parse(parts[4].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
-                    matches.setHostWin(Integer.parseInt(parts[5].trim()));
+                    String hostWinValue = parts[5].trim();
+                    boolean hostWinBoolean = "1".equals(hostWinValue);
+                    matches.setHostWin(hostWinBoolean);
                     matches.setPreRatingHost(Integer.valueOf(parts[6].trim()));
                     matches.setPostRatingHost(Integer.valueOf(parts[7].trim()));
                     matches.setPreRatingGuest(Integer.valueOf(parts[8].trim()));
@@ -85,21 +92,27 @@ public class main {
             case "n":
                 if (parts.length == 4) {
                     Matches matches = new Matches();
-                    matches.setHostID(parts[1].trim());
-                    matches.setGuestID(parts[2].trim());
+                    Integer HostId = Integer.valueOf(parts[1].trim());
+                    Integer GuestID = Integer.valueOf(parts[2].trim());
+                    matches.setHostID(HostId);
+                    matches.setGuestID(GuestID);
                     matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
                     service.addPlayedInformation(matches);
                 }
                 break;
 
             case "c":
-                if (parts.length == 10) {
+                    if (parts.length == 10) {
                     Matches matches = new Matches();
-                    matches.setHostID(parts[1].trim());
-                    matches.setGuestID(parts[2].trim());
+                    Integer HostId = Integer.valueOf(parts[1].trim());
+                    Integer GuestID = Integer.valueOf(parts[2].trim());
+                    matches.setHostID(HostId);
+                    matches.setGuestID(GuestID);
                     matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
                     matches.setEnd(LocalDateTime.parse(parts[4].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
-                    matches.setHostWin(Integer.parseInt(parts[5].trim()));
+                    String hostWinValue = parts[5].trim();
+                    boolean hostWinBoolean = "1".equals(hostWinValue);
+                    matches.setHostWin(hostWinBoolean);
                     matches.setPreRatingHost(Integer.valueOf(parts[6].trim()));
                     matches.setPostRatingHost(Integer.valueOf(parts[7].trim()));
                     matches.setPreRatingGuest(Integer.valueOf(parts[8].trim()));
@@ -111,7 +124,7 @@ public class main {
                 if (parts.length == 2) {
                     String ID = parts[1].trim();
                     Player player = service.selectPlayer(ID);
-                    System.out.println(player.getId() + ", " + player.getName() + ", " + player.getBirthdate() + ", " + player.getState());
+                    System.out.println(player.getId() + ", " + player.getName() + ", " + player.getBirthdate()+", " + player.getRating() + ", " + player.getState());
                 }
                 break;
             case "A":
