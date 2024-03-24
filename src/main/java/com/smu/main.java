@@ -1,12 +1,13 @@
 package com.smu;
 
+import com.smu.controller.Commands;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Scanner;
-
-import static com.smu.controller.executeCommand.executeCommand;
+import static com.smu.controller.Commands.executeCommands;
 
 /**
  * @Author: MingYun
@@ -22,7 +23,7 @@ public class main {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line;
             while ((line = reader.readLine()) != null) {
-                executeCommand(line);
+                executeCommands(line);
 
             }
             reader.close();
@@ -33,4 +34,5 @@ public class main {
         }
 
     }
+
 }

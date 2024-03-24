@@ -1,3 +1,4 @@
+/*
 package com.smu.controller;
 
 import com.smu.domain.Matches;
@@ -13,19 +14,23 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+*/
 /**
  * @Author: MingYun
  * @Date: 2024-02-28 16:46
- */
+ *//*
+
 public class executeCommand {
 
     private final static Service service = new Service();
 
-    /**
+    */
+/**
      *
      * @param line
      * @throws SQLException
-     */
+     *//*
+
     public static void executeCommand(String line) throws SQLException {
         String[] parts = line.split(",");
 
@@ -127,8 +132,8 @@ public class executeCommand {
                 System.out.println("----------------------------------------------------------");
                 if (parts.length == 2) {
                     String ID = parts[1].trim();
-                    Player player = service.selectPlayer(ID);
-                    System.out.println(player.getId() + ", " + player.getName() + ", " + player.getBirthdate()+", " + player.getRating() + ", " + player.getState());
+                    service.selectPlayer(ID);
+
                 }
 
                 break;
@@ -163,3 +168,4 @@ public class executeCommand {
 
 }
 
+*/
