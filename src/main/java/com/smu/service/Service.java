@@ -17,6 +17,7 @@ public class Service {
     public void checkAndCreateTable() throws SQLException {
         Connection conn = null;
         Statement st = null;
+        ResultSet rs =null ;
         try {
 
             conn = JdbcUtils.getConnection();
@@ -45,7 +46,7 @@ public class Service {
             System.out.println("Checked and created tables if not exist.");
 
         } finally {
-            if (conn != null) conn.close();
+            JdbcUtils.release(conn,st,rs);
         }
     }
 
@@ -132,25 +133,40 @@ public class Service {
         }
 
     }
+    public Boolean gameExists(Integer HostId) throws SQLException {
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = JdbcUtils.getConnection();
+            String  sql = "SELECT count(HostId) FROM Matches WHERE HostId = ?";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setInt(1,HostId);
+            ResultSet rs  = preparedStatement.executeQuery();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            return false;
+        }finally {
+            if (conn != null) conn.close();
+        }
 
+    }
     public void resultGame(Matches matches) throws SQLException {
         Connection conn = null;
         Statement st = null;
         conn = JdbcUtils.getConnection();
-
-        String sql = "UPDATE Matches SET GuestID = ?, start = ?, end = ?, HostWin = ?, PreRatingHost = ?, PostRatingHost = ?, PreRatingGuest = ?, PostRatingGuest = ? WHERE HostID = ? ";
-        PreparedStatement preparedStatement = conn.prepareStatement(sql);
-        preparedStatement.setInt(2, matches.getGuestID());
-        preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
-        preparedStatement.setTimestamp(4, Timestamp.valueOf(matches.getStart()));
-        preparedStatement.setBoolean(5, matches.getHostWin());
-        preparedStatement.setInt(6, matches.getPreRatingHost()) ;
-        preparedStatement.setInt(7, matches.getPostRatingHost());
-        preparedStatement.setInt(8, matches.getPreRatingGuest());
-        preparedStatement.setInt(9, matches.getPostRatingGuest());
-        preparedStatement.setInt(1, matches.getHostID());
-        preparedStatement.executeUpdate();
-        System.out.println("update Matches success");
+            String sql = "UPDATE Matches SET GuestID = ?, start = ?, end = ?, HostWin = ?, PreRatingHost = ?, PostRatingHost = ?, PreRatingGuest = ?, PostRatingGuest = ? WHERE HostID = ? ";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setInt(2, matches.getGuestID());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(matches.getStart()));
+            preparedStatement.setBoolean(5, matches.getHostWin());
+            preparedStatement.setInt(6, matches.getPreRatingHost());
+            preparedStatement.setInt(7, matches.getPostRatingHost());
+            preparedStatement.setInt(8, matches.getPreRatingGuest());
+            preparedStatement.setInt(9, matches.getPostRatingGuest());
+            preparedStatement.setInt(1, matches.getHostID());
+            preparedStatement.executeUpdate();
+            System.out.println("update Matches success");
     }
 
     public Player selectPlayer(String playerId) throws SQLException {
@@ -226,8 +242,8 @@ public class Service {
                     "    h.Name AS HostName, " +
                     "    g.Name AS GuestName, " +
                     "    CASE " +
-                    "        WHEN m.Hostwin THEN 'H' " +
-                    "        ELSE 'G' " +
+                    "        WHEN m.Hostwin = 1 THEN 'H' " +
+                    "       WHEN m.HostWin = 0 THEN 'G' "+
                     "    END AS Winner " +
                     "FROM " +
                     "    `Matches` m " +
@@ -236,9 +252,9 @@ public class Service {
                     "JOIN " +
                     "    `Player` g ON m.GuestID = g.ID " +
                     "WHERE " +
-                    "    m.start >= ? AND m.end <= ? " +
+                    "    m.start >= ? AND m.end <= ?" +
                     "ORDER BY " +
-                    "    m.start ASC";
+                    "    m.start ASC, m.HostID ASC";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setDate(1, Date.valueOf(startDate));
             preparedStatement.setDate(2, Date.valueOf(endDate));
@@ -261,46 +277,43 @@ public class Service {
         Statement st = null;
         try {
             conn = JdbcUtils.getConnection();
-            String sql = "SELECT m.Start, m.End, "
-                    + "CASE WHEN m.HostID=? THEN m.GuestID ELSE m.HostID END AS OpponentID, "
-                    + "o.Name AS OpponentName, "
-                    + "CASE WHEN (m.Hostwin=1 AND m.HostID=?) OR (m.Hostwin=0 AND m.GuestID=?) THEN 'W' ELSE 'L' END AS Result, "
-                    + "CASE WHEN m.HostID=? THEN m.PostRatingHost ELSE m.PostRatingGuest END AS PostMatchRating, "
-                    + "CASE WHEN m.HostID=? THEN m.PreRatingHost ELSE m.PreRatingGuest END AS PreMatchRating, "
-                    + "p.Name AS PlayerName "
-                    + "FROM Matches m "
-                    + "JOIN Player o ON (m.HostID=? AND m.GuestID=o.ID) OR (m.GuestID=? AND m.HostID=o.ID) "
-                    + "JOIN Player p ON m.HostID=p.ID OR m.GuestID=p.ID "
-                    + "WHERE m.HostID=? OR m.GuestID=? "
-                    + "ORDER BY m.Start ASC";
+            String sql = "SELECT p.ID, p.Name, m.Start, m.End, "
+                    + "CASE WHEN p.ID = m.HostID THEN m.GuestID ELSE m.HostID END AS OpponentID, "
+                    + "CASE WHEN p.ID = m.HostID THEN (SELECT Name FROM Player WHERE ID = m.GuestID) "
+                    + "ELSE (SELECT Name FROM Player WHERE ID = m.HostID) END AS OpponentName, "
+                    + "CASE WHEN (p.ID = m.HostID AND m.Hostwin = TRUE) OR (p.ID = m.GuestID AND m.Hostwin = FALSE) "
+                    + "THEN 'W' ELSE 'L' END AS Result, "
+                    + "CASE WHEN p.ID = m.HostID THEN m.PostRatingHost ELSE m.PostRatingGuest END AS PostRating, "
+                    + "CASE WHEN p.ID = m.HostID THEN m.PreRatingHost ELSE m.PreRatingGuest END AS PreRating "
+                    + "FROM Player p "
+                    + "INNER JOIN Matches m ON p.ID = m.HostID OR p.ID = m.GuestID "
+                    + "WHERE p.ID = ? "
+                    + "ORDER BY m.Start";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            for (int i = 1; i <= 9; i++) {
-                preparedStatement.setString(i, id);
-            }
+
+            preparedStatement.setString(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            int lastPostMatchRating = -1;
+            int lastPostRating = -1 ;
+            boolean isFirstRow = true;
             while (resultSet.next()) {
-
-                String startDate = resultSet.getString("start");
-                String endDate = resultSet.getString("end");
-                int opponentId = resultSet.getInt("OpponentID");
-                String opponentName = resultSet.getString("OpponentName");
-                String result = resultSet.getString("Result");
-                int postMatchRating = resultSet.getInt("PostMatchRating");
-                int preMatchRating = resultSet.getInt("PreMatchRating");
-                String playerId = id;
-                String playerName = resultSet.getString("PlayerName");
-
-                if (lastPostMatchRating == -1) {
-                    System.out.println(playerId + ", " + playerName);
+                if (isFirstRow) {
+                    System.out.println(resultSet.getInt("ID") + ", " + resultSet.getString("name"));
+                    isFirstRow = false;
                 }
-                // Check for inconsistent ratings
-                if (lastPostMatchRating != -1 && preMatchRating != lastPostMatchRating) {
-                    System.out.println("Inconsistent rating");
-                }
-                System.out.println(startDate + ", " + endDate + ", " + opponentId + ", " + opponentName + ", " + result + ", " + postMatchRating);
+                int currentPreRating = resultSet.getInt("PreRating");
+                if (lastPostRating != -1 && currentPreRating != lastPostRating) {
 
-                lastPostMatchRating = postMatchRating;
+                    System.out.println("inconsistent rating");
+                }
+                System.out.println(resultSet.getString("Start") + ", " + resultSet.getString("End") + ", "
+                        + resultSet.getInt("OpponentID") + ", " + resultSet.getString("OpponentName") + ", "
+                        + resultSet.getString("Result") + ", " + resultSet.getInt("PostRating"));
+
+                lastPostRating = resultSet.getInt("PostRating");
+                if (isFirstRow) {
+
+                    System.out.println("No matches found for player ID: " + id);
+                }
             }
         } finally {
             if (conn != null) conn.close();

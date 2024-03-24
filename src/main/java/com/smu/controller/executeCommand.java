@@ -17,45 +17,33 @@ import java.util.Scanner;
  * @Author: MingYun
  * @Date: 2024-02-28 16:46
  */
-public class main {
+public class executeCommand {
 
     private final static Service service = new Service();
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the name of the CSV file:");
-        String fileName = scanner.nextLine();
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                executeCommand(line);
-            }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
+    /**
+     *
+     * @param line
+     * @throws SQLException
+     */
     public static void executeCommand(String line) throws SQLException {
         String[] parts = line.split(",");
-        // skip empty lines
+
         if (parts.length == 0) {
             return;
         }
         String command = parts[0];
         switch (command) {
             case "e":
+                System.out.println("----------------------------------------------------------");
                 service.checkAndCreateTable();
                 break;
             case "r":
+                System.out.println("----------------------------------------------------------");
                 service.clearAllData();
                 break;
             case "p":
+                System.out.println("----------------------------------------------------------");
                 if (parts.length == 6) {
                     Player player = new Player();
                     Integer Id = Integer.valueOf(parts[1].trim());
@@ -70,13 +58,16 @@ public class main {
                 break;
 
             case "m":
+                System.out.println("----------------------------------------------------------");
                 if (parts.length == 10) {
                     Matches matches = new Matches();
                     Integer HostId = Integer.valueOf(parts[1].trim());
                     matches.setHostID(HostId);
                     Integer GuestId = Integer.valueOf(parts[2].trim());
                     matches.setGuestID(GuestId);
+                    //Use 24-hour format for HH
                     matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
+                    //Use 24-hour format for HH
                     matches.setEnd(LocalDateTime.parse(parts[4].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
                     String hostWinValue = parts[5].trim();
                     boolean hostWinBoolean = "1".equals(hostWinValue);
@@ -87,9 +78,11 @@ public class main {
                     matches.setPostRatingGuest(Integer.valueOf(parts[9].trim()));
                     service.addMatches(matches);
                 }
+
                 break;
 
             case "n":
+                System.out.println("----------------------------------------------------------");
                 if (parts.length == 4) {
                     Matches matches = new Matches();
                     Integer HostId = Integer.valueOf(parts[1].trim());
@@ -99,48 +92,64 @@ public class main {
                     matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
                     service.addPlayedInformation(matches);
                 }
+
                 break;
 
             case "c":
-                    if (parts.length == 10) {
-                    Matches matches = new Matches();
-                    Integer HostId = Integer.valueOf(parts[1].trim());
-                    Integer GuestID = Integer.valueOf(parts[2].trim());
-                    matches.setHostID(HostId);
-                    matches.setGuestID(GuestID);
-                    matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
-                    matches.setEnd(LocalDateTime.parse(parts[4].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
-                    String hostWinValue = parts[5].trim();
-                    boolean hostWinBoolean = "1".equals(hostWinValue);
-                    matches.setHostWin(hostWinBoolean);
-                    matches.setPreRatingHost(Integer.valueOf(parts[6].trim()));
-                    matches.setPostRatingHost(Integer.valueOf(parts[7].trim()));
-                    matches.setPreRatingGuest(Integer.valueOf(parts[8].trim()));
-                    matches.setPostRatingGuest(Integer.valueOf(parts[9].trim()));
-                    service.resultGame(matches);
+                System.out.println("----------------------------------------------------------");
+                if (parts.length == 2) {
+                    Integer ID = Integer.valueOf(parts[1].trim());
+                    Boolean  exists = service.gameExists(ID);
+                    if(exists){
+                        Matches matches = new Matches();
+                        Integer HostId = Integer.valueOf(parts[1].trim());
+                        Integer GuestID = Integer.valueOf(parts[2].trim());
+                        matches.setHostID(HostId);
+                        matches.setGuestID(GuestID);
+                        //Use 24-hour format for HH
+                        matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
+                        //Use 24-hour format for HH
+                        matches.setEnd(LocalDateTime.parse(parts[4].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
+                        String hostWinValue = parts[5].trim();
+                        boolean hostWinBoolean = "1".equals(hostWinValue);
+                        matches.setHostWin(hostWinBoolean);
+                        matches.setPreRatingHost(Integer.valueOf(parts[6].trim()));
+                        matches.setPostRatingHost(Integer.valueOf(parts[7].trim()));
+                        matches.setPreRatingGuest(Integer.valueOf(parts[8].trim()));
+                        matches.setPostRatingGuest(Integer.valueOf(parts[9].trim()));
+                        service.resultGame(matches);
+                    }else{
+                        System.out.println("reject");
+                    }
                 }
                 break;
             case "P":
+                System.out.println("----------------------------------------------------------");
                 if (parts.length == 2) {
                     String ID = parts[1].trim();
                     Player player = service.selectPlayer(ID);
                     System.out.println(player.getId() + ", " + player.getName() + ", " + player.getBirthdate()+", " + player.getRating() + ", " + player.getState());
                 }
+
                 break;
             case "A":
+                System.out.println("----------------------------------------------------------");
                 if (parts.length == 2) {
                     String ID = parts[1].trim();
                     service.selectWinList(ID);
                 }
                 break;
             case "D":
+                System.out.println("----------------------------------------------------------");
                 if (parts.length == 3) {
                     LocalDate startDate = LocalDate.parse(parts[1].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
                     LocalDate endDate = LocalDate.parse(parts[2].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
                     service.dateMatches(startDate, endDate);
                 }
                 break;
+
             case "M":
+                System.out.println("----------------------------------------------------------");
                 if (parts.length == 2) {
                     String ID = parts[1].trim();
                     service.ListMatches(ID);
