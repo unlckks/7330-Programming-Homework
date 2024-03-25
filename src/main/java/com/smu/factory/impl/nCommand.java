@@ -18,12 +18,20 @@ public class nCommand implements Command {
     @Override
     public void execute(String[] parts) throws SQLException {
         System.out.println("----------------------------------------------------------");
-        Matches matches = new Matches();
-        Integer HostId = Integer.valueOf(parts[1].trim());
-        Integer GuestID = Integer.valueOf(parts[2].trim());
-        matches.setHostID(HostId);
-        matches.setGuestID(GuestID);
-        matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
-        service.addMatchesInformation(matches);
+        Integer hostId = Integer.valueOf(parts[1].trim());
+        Integer gustId = Integer.valueOf(parts[2].trim());
+        Boolean  exists = service.gameExists(hostId , gustId);
+        if(!exists){
+            Matches matches = new Matches();
+            Integer HostId = Integer.valueOf(parts[1].trim());
+            Integer GuestID = Integer.valueOf(parts[2].trim());
+            matches.setHostID(HostId);
+            matches.setGuestID(GuestID);
+            matches.setStart(LocalDateTime.parse(parts[3].trim(), DateTimeFormatter.ofPattern("yyyyMMdd:HH:mm:ss")));
+            service.addMatchesInformation(matches);
+        }else{
+            System.out.printf("Invalid case :Match already exists");
+        }
+
     }
 }

@@ -18,10 +18,13 @@ public class cCommand implements Command {
     @Override
     public void execute(String[] parts) throws SQLException {
         System.out.println("----------------------------------------------------------");
-        Integer ID = Integer.valueOf(parts[1].trim());
-        Boolean  exists = service.gameExists(ID);
-        if(!exists){
+        Integer hostId = Integer.valueOf(parts[1].trim());
+        Integer gustId = Integer.valueOf(parts[2].trim());
+        Boolean  exists = service.gameExists(hostId , gustId);
+        if(exists){
             Matches matches = new Matches();
+            matches.setHostID(hostId);
+            matches.setGuestID(gustId);
             Integer HostId = Integer.valueOf(parts[1].trim());
             Integer GuestID = Integer.valueOf(parts[2].trim());
             matches.setHostID(HostId);

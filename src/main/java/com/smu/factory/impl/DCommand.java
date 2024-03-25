@@ -16,9 +16,9 @@ public class DCommand implements Command {
 
     @Override
     public void execute(String[] parts) throws SQLException {
-        System.out.println("----------------------------------------------------------");
-        LocalDate startDate = LocalDate.parse(parts[1].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
-        LocalDate endDate = LocalDate.parse(parts[2].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+            System.out.println("----------------------------------------------------------");
+            LocalDate startDate = LocalDate.parse(parts[1].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+            LocalDate endDate = LocalDate.parse(parts[2].trim(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         service.dateMatches(startDate, endDate);
     }
 }

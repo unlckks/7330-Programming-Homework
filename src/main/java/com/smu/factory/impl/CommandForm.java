@@ -18,7 +18,6 @@ public class CommandForm implements Command {
     @Override
     public void execute(String[] parts) throws SQLException {
         System.out.println("----------------------------------------------------------");
-        if (parts.length == 10) {
             Matches matches = new Matches();
             Integer HostId = Integer.valueOf(parts[1].trim());
             matches.setHostID(HostId);
@@ -37,5 +36,5 @@ public class CommandForm implements Command {
             matches.setPostRatingGuest(Integer.valueOf(parts[9].trim()));
             service.addMatches(matches);
         }
-    }
+
 }
