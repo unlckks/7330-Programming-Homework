@@ -255,9 +255,13 @@ public class Service   {
                     "    h.Name AS HostName, " +
                     "    g.Name AS GuestName, " +
                     "    CASE " +
-                    "        WHEN m.Hostwin = 1 THEN 'H' " +
-                    "       WHEN m.HostWin = 0 THEN 'G' "+
-                    "    END AS Winner " +
+                    "        WHEN m.HostWin = 1 THEN 'H' " +
+                    "        WHEN m.HostWin = 0 THEN 'G' " +
+                    "    END AS Winner," +
+                    "    h.Rating AS PreRatingHost, " +
+                    "    g.Rating AS PreRatingGuest, " +
+                    "    (h.Rating + IF(m.HostWin = 1, m.PostRatingHost - m.PreRatingHost, m.PreRatingHost - m.PostRatingHost)) AS PostRatingHost, " +
+                    "    (g.Rating + IF(m.HostWin = 0, m.PostRatingGuest - m.PreRatingGuest, m.PreRatingGuest - m.PostRatingGuest)) AS PostRatingGuest " +
                     "FROM " +
                     "    `Matches` m " +
                     "JOIN " +
@@ -265,7 +269,7 @@ public class Service   {
                     "JOIN " +
                     "    `Player` g ON m.GuestID = g.ID " +
                     "WHERE " +
-                    "    m.start >= ? AND m.end <= ?" +
+                    "    m.start >= ? AND (m.end <= ? OR m.end IS NULL) " +
                     "ORDER BY " +
                     "    m.start ASC, m.HostID ASC";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);

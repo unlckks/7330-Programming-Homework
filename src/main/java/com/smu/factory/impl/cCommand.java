@@ -20,7 +20,7 @@ public class cCommand implements Command {
         System.out.println("----------------------------------------------------------");
         Integer ID = Integer.valueOf(parts[1].trim());
         Boolean  exists = service.gameExists(ID);
-        if(exists){
+        if(!exists){
             Matches matches = new Matches();
             Integer HostId = Integer.valueOf(parts[1].trim());
             Integer GuestID = Integer.valueOf(parts[2].trim());
