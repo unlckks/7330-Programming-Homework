@@ -18,13 +18,7 @@ public class cCommand implements Command {
     @Override
     public void execute(String[] parts) throws SQLException {
         System.out.println("----------------------------------------------------------");
-        Integer hostId = Integer.valueOf(parts[1].trim());
-        Integer gustId = Integer.valueOf(parts[2].trim());
-        Boolean  exists = service.gameExists(hostId , gustId);
-        if(exists){
             Matches matches = new Matches();
-            matches.setHostID(hostId);
-            matches.setGuestID(gustId);
             Integer HostId = Integer.valueOf(parts[1].trim());
             Integer GuestID = Integer.valueOf(parts[2].trim());
             matches.setHostID(HostId);
@@ -41,8 +35,5 @@ public class cCommand implements Command {
             matches.setPreRatingGuest(Integer.valueOf(parts[8].trim()));
             matches.setPostRatingGuest(Integer.valueOf(parts[9].trim()));
             service.resultGame(matches);
-    }else{
-            System.out.println("Reject Input");
-        }
     }
 }

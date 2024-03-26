@@ -1,7 +1,6 @@
-package com.smu.factory.impl;
+package com.smu.factory;
 
-
-import com.smu.factory.Command;
+import com.smu.factory.impl.*;
 import com.smu.service.Service;
 
 public class Factory {

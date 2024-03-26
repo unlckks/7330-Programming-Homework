@@ -1,7 +1,7 @@
 package com.smu.controller;
 
 import com.smu.factory.Command;
-import com.smu.factory.impl.Factory;
+import com.smu.factory.Factory;
 import com.smu.service.Service;
 import java.sql.SQLException;
 

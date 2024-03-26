@@ -8,17 +8,16 @@ import java.sql.*;
 import java.time.LocalDate;
 
 
-
 /**
  * @Author: MingYun
  * @Date: 2024-02-28 17:25
  */
-public class Service   {
+public class Service {
 
     public void checkAndCreateTable() throws SQLException {
         Connection conn = null;
         Statement st = null;
-        ResultSet rs =null ;
+        ResultSet rs = null;
         try {
 
             conn = JdbcUtils.getConnection();
@@ -28,7 +27,7 @@ public class Service   {
                     "ID INT PRIMARY KEY," +
                     "Name VARCHAR(255) UNIQUE NOT NULL," +
                     "Birthdate DATE NOT NULL," +
-                    "Rating INT,"+
+                    "Rating INT," +
                     "State CHAR(2));";
             st.execute(sqlPlayer);
 
@@ -43,11 +42,11 @@ public class Service   {
                     "PostRatingHost INT," +
                     "PostRatingGuest INT);";
             st.execute(sqlMatches);
-
             System.out.println("e------>Checked and created Player and Matches tables if not exist");
-
+        } catch (Exception e) {
+            System.out.println(" Input Invalid");
         } finally {
-            JdbcUtils.release(conn,st,rs);
+            JdbcUtils.release(conn, st, rs);
         }
     }
 
@@ -55,6 +54,7 @@ public class Service   {
     public void clearAllData() throws SQLException {
         Connection conn = null;
         Statement st = null;
+        ResultSet rs = null;
         try {
             conn = JdbcUtils.getConnection();
 
@@ -68,8 +68,10 @@ public class Service   {
 
 
             System.out.println("r------>clear all data");
+        } catch (Exception e) {
+            System.out.println(" Input Invalid");
         } finally {
-            if (conn != null) conn.close();
+            JdbcUtils.release(conn, st, rs);
         }
     }
 
@@ -84,15 +86,14 @@ public class Service   {
             preparedStatement.setInt(1, player.getId());
             preparedStatement.setString(2, player.getName());
             preparedStatement.setDate(3, Date.valueOf(player.getBirthdate()));
-            preparedStatement.setInt(4,player.getRating());
+            preparedStatement.setInt(4, player.getRating());
             preparedStatement.setString(5, player.getState());
             preparedStatement.execute();
             System.out.println("e------>insert player data success");
         } catch (Exception e) {
-        System.out.println(" Input Invalid");
-        }
-        finally {
-            JdbcUtils.release(conn,st,rs);
+            System.out.println(" Input Invalid");
+        } finally {
+            JdbcUtils.release(conn, st, rs);
         }
     }
 
@@ -100,98 +101,118 @@ public class Service   {
     public void addMatches(Matches matches) throws SQLException {
         Connection conn = null;
         Statement st = null;
-        ResultSet rs = null ;
+        ResultSet rs = null;
         try {
             conn = JdbcUtils.getConnection();
-
-            String sql = "INSERT INTO Matches (HostID, GuestID, Start, End, HostWin, PreRatingHost, PostRatingHost, PreRatingGuest, PostRatingGuest) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1, matches.getHostID());
-            preparedStatement.setInt(2, matches.getGuestID());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(matches.getEnd()));
-            preparedStatement.setBoolean(5, matches.getHostWin());
-            preparedStatement.setInt(6, matches.getPreRatingHost());
-            preparedStatement.setInt(7, matches.getPostRatingHost());
-            preparedStatement.setInt(8, matches.getPreRatingGuest());
-            preparedStatement.setInt(9, matches.getPostRatingGuest());
-            preparedStatement.execute();
-            System.out.println("m------>insert Matches data success");
-        }  catch (Exception e) {
+            String checkSql = "SELECT COUNT(*) FROM Matches WHERE HostID = ? AND GuestID = ? AND Start = ? AND End = ? AND HostWin = ?";
+            PreparedStatement pst = conn.prepareStatement(checkSql);
+            pst.setInt(1, matches.getHostID());
+            pst.setInt(2, matches.getGuestID());
+            pst.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
+            pst.setTimestamp(4, Timestamp.valueOf(matches.getEnd()));
+            pst.setBoolean(5, matches.getHostWin());
+            rs = pst.executeQuery();
+            if (rs.next() && rs.getInt(1) == 0) {
+                String sql = "INSERT INTO Matches (HostID, GuestID, Start, End, HostWin, PreRatingHost, PostRatingHost, PreRatingGuest, PostRatingGuest) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setInt(1, matches.getHostID());
+                preparedStatement.setInt(2, matches.getGuestID());
+                preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
+                preparedStatement.setTimestamp(4, Timestamp.valueOf(matches.getEnd()));
+                preparedStatement.setBoolean(5, matches.getHostWin());
+                preparedStatement.setInt(6, matches.getPreRatingHost());
+                preparedStatement.setInt(7, matches.getPostRatingHost());
+                preparedStatement.setInt(8, matches.getPreRatingGuest());
+                preparedStatement.setInt(9, matches.getPostRatingGuest());
+                preparedStatement.execute();
+                System.out.println("m------>insert Matches data success");
+            } else {
+                System.out.println("m------> Match data already exists");
+            }
+        } catch (Exception e) {
             System.out.println(" Input Invalid");
-        }finally {
-            JdbcUtils.release(conn,st,rs);
+        } finally {
+            JdbcUtils.release(conn, st, rs);
         }
+
     }
 
 
     public void addMatchesInformation(Matches matches) throws SQLException {
         Connection conn = null;
         Statement st = null;
-        ResultSet rs = null ;
+        ResultSet rs = null;
         try {
             conn = JdbcUtils.getConnection();
-            String sql = "INSERT INTO Matches (HostID, GuestID, start) VALUES (?, ?, ?)";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1, matches.getHostID());
-            preparedStatement.setInt(2, matches.getGuestID());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
-            preparedStatement.execute();
-            System.out.println("n------>insert Matches information success");
-        }  catch (Exception e) {
-            System.out.println(" Input Invalid");
-        } finally {
-            JdbcUtils.release(conn,st,rs);
-        }
-
-    }
-    public Boolean gameExists(Integer hostId , Integer gustId) throws SQLException {
-        Connection conn = null;
-        Statement st = null;
-        ResultSet rs = null ;
-        try {
-            conn = JdbcUtils.getConnection();
-            String  sql = "SELECT COUNT(*) FROM Matches WHERE HostID = ? AND GuestID = ?";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setInt(1,hostId);
-            preparedStatement.setInt(2 ,gustId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                int count = resultSet.getInt(1);
-                if(count > 0 ){
-                    return true ;
-                }
+            String isGameResult = "SELECT COUNT(*) FROM Matches WHERE HostID = ? AND GuestID = ? AND Start = ? ";
+            PreparedStatement pst = conn.prepareStatement(isGameResult);
+            pst.setInt(1, matches.getHostID());
+            pst.setInt(2, matches.getGuestID());
+            pst.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
+            ResultSet resultSet = pst.executeQuery();
+            if (resultSet.next() && resultSet.getInt(1) == 0) {
+                String sql = "INSERT INTO Matches (HostID, GuestID, start) VALUES (?, ?, ?)";
+                pst.close();
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setInt(1, matches.getHostID());
+                preparedStatement.setInt(2, matches.getGuestID());
+                preparedStatement.setTimestamp(3, Timestamp.valueOf(matches.getStart()));
+                preparedStatement.execute();
+                System.out.println("n------>insert Matches information success");
+            } else {
+                System.out.println("Invalid case :Match already exists");
             }
+
         } catch (Exception e) {
-            System.out.println("Input Invalid");
-        }finally {
-            JdbcUtils.release(conn,st,rs);
+            System.out.println(" Invalid case :Match already exists");
+        } finally {
+            if (rs != null) try {
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (st != null) try {
+                st.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (conn != null) JdbcUtils.release(conn, null, null);
         }
-        return false ;
     }
+
+
     public void resultGame(Matches matches) throws SQLException {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
         try {
             conn = JdbcUtils.getConnection();
-            String sql = "UPDATE Matches SET  Start = ?, End = ?, HostWin = ?, PreRatingHost = ?, PostRatingHost = ?, PreRatingGuest = ?, PostRatingGuest = ? WHERE HostID = ? AND GuestID = ?";
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-            preparedStatement.setTimestamp(1, Timestamp.valueOf(matches.getStart()));
-            preparedStatement.setTimestamp(2, Timestamp.valueOf(matches.getEnd()));
-            preparedStatement.setBoolean(3, matches.getHostWin());
-            preparedStatement.setInt(4, matches.getPreRatingHost());
-            preparedStatement.setInt(5, matches.getPostRatingHost());
-            preparedStatement.setInt(6, matches.getPreRatingGuest());
-            preparedStatement.setInt(7, matches.getPostRatingGuest());
-            preparedStatement.setInt(8, matches.getHostID());
-            preparedStatement.setInt(9, matches.getGuestID());
-            preparedStatement.executeUpdate();
-            System.out.println("c------>update Matches success");
+            String isGameResult = "SELECT COUNT(*) FROM Matches WHERE HostID = ? AND GuestID = ?";
+            PreparedStatement pst = conn.prepareStatement(isGameResult);
+            pst.setInt(1, matches.getHostID());
+            pst.setInt(2, matches.getGuestID());
+            ResultSet resultSet = pst.executeQuery();
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
+                String sql = "UPDATE Matches SET  Start = ?, End = ?, HostWin = ?, PreRatingHost = ?, PostRatingHost = ?, PreRatingGuest = ?, PostRatingGuest = ? WHERE HostID = ? AND GuestID = ?";
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(matches.getStart()));
+                preparedStatement.setTimestamp(2, Timestamp.valueOf(matches.getEnd()));
+                preparedStatement.setBoolean(3, matches.getHostWin());
+                preparedStatement.setInt(4, matches.getPreRatingHost());
+                preparedStatement.setInt(5, matches.getPostRatingHost());
+                preparedStatement.setInt(6, matches.getPreRatingGuest());
+                preparedStatement.setInt(7, matches.getPostRatingGuest());
+                preparedStatement.setInt(8, matches.getHostID());
+                preparedStatement.setInt(9, matches.getGuestID());
+                preparedStatement.executeUpdate();
+                System.out.println("c------>update Matches success");
+            } else {
+                System.out.println("Reject Input");
+            }
         } catch (Exception e) {
             System.out.println(" Input Invalid");
-        }finally {
-            JdbcUtils.release(conn,st,rs);
+        } finally {
+            JdbcUtils.release(conn, st, rs);
         }
     }
 
@@ -214,13 +235,12 @@ public class Service   {
                 player.setBirthdate(birthdate);
                 player.setRating(resultSet.getInt("rating"));
                 player.setState(resultSet.getString("state"));
-                System.out.println(player.getId() + ", " + player.getName() + ", " + player.getBirthdate()+", " + player.getRating() + ", " + player.getState());
+                System.out.println(player.getId() + ", " + player.getName() + ", " + player.getBirthdate() + ", " + player.getRating() + ", " + player.getState());
             }
-
         } catch (Exception e) {
             System.out.println(" Input Invalid");
         } finally {
-            JdbcUtils.release(conn,st,rs);
+            JdbcUtils.release(conn, st, rs);
         }
     }
 
@@ -258,11 +278,11 @@ public class Service   {
                     lastPlayerName = playerName;
                 }
 
-                System.out.println(opponentId + ", " + opponentName  + ", " + wins + ", " + lost);
+                System.out.println(opponentId + ", " + opponentName + ", " + wins + ", " + lost);
             }
             return player;
         } finally {
-            JdbcUtils.release(conn,st,rs);
+            JdbcUtils.release(conn, st, rs);
         }
     }
 
@@ -280,7 +300,7 @@ public class Service   {
                     "    CASE " +
                     "        WHEN m.HostWin = 1 THEN 'H' " +
                     "        WHEN m.HostWin = 0 THEN 'G' " +
-                    "    END AS Winner "  +
+                    "    END AS Winner " +
                     "FROM " +
                     "    `Matches` m " +
                     "JOIN " +
@@ -300,68 +320,91 @@ public class Service   {
                 String endTime = resultSet.getString("end");
                 String hostName = resultSet.getString("HostName");
                 String guestName = resultSet.getString("GuestName");
-                String  hostWins = resultSet.getString("Winner");
+                String hostWins = resultSet.getString("Winner");
                 System.out.println(startTime + ", " + endTime + ", " + hostName + ", " + guestName + ", " + hostWins);
             }
-        }  catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(" Input Invalid");
         } finally {
-            JdbcUtils.release(conn,st,rs);
+            JdbcUtils.release(conn, st, rs);
         }
     }
 
     public void ListMatches(String id) throws SQLException {
         Connection conn = null;
         Statement st = null;
-        ResultSet rs = null ;
+        ResultSet rs = null;
         try {
             conn = JdbcUtils.getConnection();
-            String sql = "SELECT p.ID, p.Name, m.Start, m.End, "
-                    + "CASE WHEN p.ID = m.HostID THEN m.GuestID ELSE m.HostID END AS OpponentID, "
-                    + "CASE WHEN p.ID = m.HostID THEN (SELECT Name FROM Player WHERE ID = m.GuestID) "
-                    + "ELSE (SELECT Name FROM Player WHERE ID = m.HostID) END AS OpponentName, "
-                    + "CASE WHEN (p.ID = m.HostID AND m.Hostwin = TRUE) OR (p.ID = m.GuestID AND m.Hostwin = FALSE) "
-                    + "THEN 'W' ELSE 'L' END AS Result, "
-                    + "CASE WHEN p.ID = m.HostID THEN m.PostRatingHost ELSE m.PostRatingGuest END AS PostRating, "
-                    + "CASE WHEN p.ID = m.HostID THEN m.PreRatingHost ELSE m.PreRatingGuest END AS PreRating "
-                    + "FROM Player p "
-                    + "INNER JOIN Matches m ON p.ID = m.HostID OR p.ID = m.GuestID "
-                    + "WHERE p.ID = ? "
-                    + "ORDER BY m.Start";
+            String sql = "SELECT " +
+                    "p.ID, " +
+                    "p.Name, " +
+                    "m.Start, " +
+                    "m.End, " +
+                    "CASE " +
+                    "WHEN p.ID = m.HostID THEN m.GuestID " +
+                    "ELSE m.HostID " +
+                    "END AS OpponentID, " +
+                    "CASE " +
+                    "WHEN p.ID = m.HostID THEN (SELECT Name FROM Player WHERE ID = m.GuestID) " +
+                    "ELSE (SELECT Name FROM Player WHERE ID = m.HostID) " +
+                    "END AS OpponentName, " +
+                    "CASE " +
+                    "WHEN (p.ID = m.HostID AND m.Hostwin = 1) THEN 'W' " +
+                    "WHEN (p.ID = m.GuestID AND m.Hostwin = 1) THEN 'W' " +
+                    "WHEN (p.ID = m.HostID AND m.Hostwin = 0) THEN 'L' " +
+                    "WHEN (p.ID = m.GuestID AND m.Hostwin = 0) THEN 'L' " +
+                    "END AS Result, " +
+                    "m.PostRatingHost AS PostRating, " +
+                    "CASE " +
+                    "WHEN p.ID = m.HostID THEN m.PreRatingHost " +
+                    "ELSE m.PreRatingGuest " +
+                    "END AS PreRating " +
+                    "FROM " +
+                    "Player p " +
+                    "INNER JOIN " +
+                    "Matches m " +
+                    "ON " +
+                    "p.ID = m.HostID OR p.ID = m.GuestID " +
+                    "WHERE " +
+                    "p.ID = ? " +
+                    "AND NOT " +
+                    "(p.ID = m.HostID AND p.ID = m.GuestID) " +
+                    "ORDER BY " +
+                    "m.Start";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
             preparedStatement.setString(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            int lastPostRating = -1 ;
+            int lastPostRating = -1;
             boolean isFirstRow = true;
             while (resultSet.next()) {
                 if (isFirstRow) {
                     System.out.println(resultSet.getInt("ID") + ", " + resultSet.getString("name"));
                     isFirstRow = false;
+                } else if (lastPostRating != -1 && resultSet.getInt("PreRating") != lastPostRating) {
+                    System.out.println("inconsistent rating ");
                 }
-                int currentPreRating = resultSet.getInt("PreRating");
-                if (lastPostRating != -1 && currentPreRating != lastPostRating) {
 
-                    System.out.println("inconsistent rating");
-                }
                 String start = resultSet.getString("Start");
                 String end = resultSet.getString("End");
                 String opponentName = resultSet.getString("OpponentName");
                 int opponentID = resultSet.getInt("OpponentID");
-                int postRating = resultSet.getInt("PostRating");
                 String result = resultSet.getString("Result");
-                System.out.println(start + ", " + end + ", "
-                        +  opponentName + ", " +opponentID+ ", "
-                        +postRating + ", " +result);
-                lastPostRating = resultSet.getInt("PostRating");
-                if (isFirstRow) {
-                    System.out.println("No matches found for player ID: " + id);
-                }
+                int postRating = resultSet.getInt("PostRating");
+
+                System.out.println(start + ", " + end + ", " + opponentName + ", " + opponentID + ", " + result + ", " + postRating);
+
+                lastPostRating = postRating;
             }
-        }  catch (Exception e) {
+            if (isFirstRow) {
+                System.out.println("No matches found for player ID: " + id);
+            }
+
+        } catch (Exception e) {
             System.out.println(" Input Invalid");
         } finally {
-            JdbcUtils.release(conn,st,rs);
+            JdbcUtils.release(conn, st, rs);
         }
 
     }
