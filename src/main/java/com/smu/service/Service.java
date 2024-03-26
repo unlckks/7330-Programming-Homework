@@ -324,7 +324,7 @@ public class Service {
                 System.out.println(startTime + ", " + endTime + ", " + hostName + ", " + guestName + ", " + hostWins);
             }
         } catch (Exception e) {
-            System.out.println(" Input Invalid");
+            System.out.println(e.getMessage());
         } finally {
             JdbcUtils.release(conn, st, rs);
         }
@@ -336,54 +336,46 @@ public class Service {
         ResultSet rs = null;
         try {
             conn = JdbcUtils.getConnection();
-            String sql = "SELECT " +
-                    "p.ID, " +
-                    "p.Name, " +
-                    "m.Start, " +
-                    "m.End, " +
+            String sql = "SELECT p.ID, p.Name, m.Start, m.End, " +
                     "CASE " +
-                    "WHEN p.ID = m.HostID THEN m.GuestID " +
-                    "ELSE m.HostID " +
+                    "    WHEN p.ID = m.HostID THEN m.GuestID " +
+                    "    ELSE m.HostID " +
                     "END AS OpponentID, " +
                     "CASE " +
-                    "WHEN p.ID = m.HostID THEN (SELECT Name FROM Player WHERE ID = m.GuestID) " +
-                    "ELSE (SELECT Name FROM Player WHERE ID = m.HostID) " +
+                    "    WHEN p.ID = m.HostID THEN (SELECT Name FROM Player WHERE ID = m.GuestID) " +
+                    "    ELSE (SELECT Name FROM Player WHERE ID = m.HostID) " +
                     "END AS OpponentName, " +
                     "CASE " +
-                    "WHEN (p.ID = m.HostID AND m.Hostwin = 1) THEN 'W' " +
-                    "WHEN (p.ID = m.GuestID AND m.Hostwin = 1) THEN 'W' " +
-                    "WHEN (p.ID = m.HostID AND m.Hostwin = 0) THEN 'L' " +
-                    "WHEN (p.ID = m.GuestID AND m.Hostwin = 0) THEN 'L' " +
+                    "    WHEN (p.ID = m.HostID AND m.Hostwin = 1) THEN 'W' " +
+                    "    WHEN (p.ID = m.GuestID AND m.Hostwin = 0) THEN 'W' " +
+                    "    WHEN (p.ID = m.HostID AND m.Hostwin = 0) THEN 'L' " +
+                    "    WHEN (p.ID = m.GuestID AND m.Hostwin = 1) THEN 'L' " +
                     "END AS Result, " +
-                    "m.PostRatingHost AS PostRating, " +
                     "CASE " +
-                    "WHEN p.ID = m.HostID THEN m.PreRatingHost " +
-                    "ELSE m.PreRatingGuest " +
+                    "    WHEN p.ID = m.HostID THEN m.PostRatingHost " +
+                    "    ELSE m.PostRatingGuest " +
+                    "END AS PostRating, " +
+                    "m.PostRatingHost AS PostRating, "+
+                    "CASE " +
+                    "    WHEN p.ID = m.HostID THEN m.PreRatingHost " +
+                    "    ELSE m.PreRatingGuest " +
                     "END AS PreRating " +
-                    "FROM " +
-                    "Player p " +
-                    "INNER JOIN " +
-                    "Matches m " +
-                    "ON " +
-                    "p.ID = m.HostID OR p.ID = m.GuestID " +
-                    "WHERE " +
-                    "p.ID = ? " +
-                    "AND NOT " +
-                    "(p.ID = m.HostID AND p.ID = m.GuestID) " +
-                    "ORDER BY " +
-                    "m.Start";
+                    "FROM Player p " +
+                    "INNER JOIN Matches m ON p.ID = m.HostID OR p.ID = m.GuestID " +
+                    "WHERE p.ID = ? " +
+                    "ORDER BY m.Start";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
             preparedStatement.setString(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             int lastPostRating = -1;
             boolean isFirstRow = true;
+            boolean isFlagged = false;
             while (resultSet.next()) {
+
                 if (isFirstRow) {
                     System.out.println(resultSet.getInt("ID") + ", " + resultSet.getString("name"));
                     isFirstRow = false;
-                } else if (lastPostRating != -1 && resultSet.getInt("PreRating") != lastPostRating) {
-                    System.out.println("inconsistent rating ");
                 }
 
                 String start = resultSet.getString("Start");
@@ -393,16 +385,22 @@ public class Service {
                 String result = resultSet.getString("Result");
                 int postRating = resultSet.getInt("PostRating");
 
-                System.out.println(start + ", " + end + ", " + opponentName + ", " + opponentID + ", " + result + ", " + postRating);
+                if (result != null && postRating != 0) {
+                    isFlagged = true ;
 
-                lastPostRating = postRating;
-            }
-            if (isFirstRow) {
-                System.out.println("No matches found for player ID: " + id);
-            }
+                    if (isFlagged && lastPostRating != -1 && resultSet.getInt("PreRating") != lastPostRating) {
+                        System.out.println("inconsistent rating ");
+                    }
+                    System.out.println(start + ", " + end + ", " + opponentName + ", " + opponentID + ", " + result + ", " + postRating);
 
+                    lastPostRating = postRating;
+                }
+                if (isFirstRow) {
+                    System.out.println("No matches found for player ID: " + id);
+                }
+            }
         } catch (Exception e) {
-            System.out.println(" Input Invalid");
+            System.out.println(e.getMessage());
         } finally {
             JdbcUtils.release(conn, st, rs);
         }
