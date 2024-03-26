@@ -244,7 +244,7 @@ public class Service {
         }
     }
 
-    public Player selectWinList(String id) throws SQLException {
+    public void selectWinList(String id) throws SQLException {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -264,7 +264,6 @@ public class Service {
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Player player = new Player();
             String lastPlayerName = "";
             while (resultSet.next()) {
                 String playerId = resultSet.getString("PlayerID");
@@ -280,10 +279,13 @@ public class Service {
 
                 System.out.println(opponentId + ", " + opponentName + ", " + wins + ", " + lost);
             }
-            return player;
+
+        } catch (Exception e) {
+            System.out.println(" Input Invalid");
         } finally {
             JdbcUtils.release(conn, st, rs);
         }
+
     }
 
     public void dateMatches(LocalDate startDate, LocalDate endDate) throws SQLException {
@@ -324,7 +326,7 @@ public class Service {
                 System.out.println(startTime + ", " + endTime + ", " + hostName + ", " + guestName + ", " + hostWins);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(" Input Invalid");
         } finally {
             JdbcUtils.release(conn, st, rs);
         }
@@ -393,7 +395,7 @@ public class Service {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(" Input Invalid");
         } finally {
             JdbcUtils.release(conn, st, rs);
         }

@@ -17,6 +17,7 @@ public class nCommand implements Command {
 
     @Override
     public void execute(String[] parts) throws SQLException {
+        System.out.println("----------------------------------------------------------");
             Matches matches = new Matches();
             Integer HostId = Integer.valueOf(parts[1].trim());
             Integer GuestID = Integer.valueOf(parts[2].trim());
