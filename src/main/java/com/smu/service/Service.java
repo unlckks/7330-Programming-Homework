@@ -355,7 +355,6 @@ public class Service {
                     "    WHEN p.ID = m.HostID THEN m.PostRatingHost " +
                     "    ELSE m.PostRatingGuest " +
                     "END AS PostRating, " +
-                    "m.PostRatingHost AS PostRating, "+
                     "CASE " +
                     "    WHEN p.ID = m.HostID THEN m.PreRatingHost " +
                     "    ELSE m.PreRatingGuest " +
@@ -370,7 +369,6 @@ public class Service {
             ResultSet resultSet = preparedStatement.executeQuery();
             int lastPostRating = -1;
             boolean isFirstRow = true;
-            boolean isFlagged = false;
             while (resultSet.next()) {
 
                 if (isFirstRow) {
@@ -384,19 +382,14 @@ public class Service {
                 int opponentID = resultSet.getInt("OpponentID");
                 String result = resultSet.getString("Result");
                 int postRating = resultSet.getInt("PostRating");
-
-                if (result != null && postRating != 0) {
-                    isFlagged = true ;
-
-                    if (isFlagged && lastPostRating != -1 && resultSet.getInt("PreRating") != lastPostRating) {
-                        System.out.println("inconsistent rating ");
-                    }
-                    System.out.println(start + ", " + end + ", " + opponentName + ", " + opponentID + ", " + result + ", " + postRating);
-
-                    lastPostRating = postRating;
+                int preRating = resultSet.getInt("PreRating");
+                if (lastPostRating != -1 && preRating != lastPostRating && result != null) {
+                    System.out.println("inconsistent rating ");
                 }
-                if (isFirstRow) {
-                    System.out.println("No matches found for player ID: " + id);
+                System.out.println(start + ", " + end + ", " + opponentName + ", " + opponentID + ", " + result + ", " + postRating);
+
+                if (result != null) {
+                    lastPostRating = postRating;
                 }
             }
         } catch (Exception e) {
