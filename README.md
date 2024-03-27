@@ -31,7 +31,7 @@ dbprog
 │   │   │   ├── com
 │   │   │   │   ├── smu
 │   │   │   │   │   ├── controller
-│   │   │   │   │   │   └── Commands.java   # Controller class to handle HTTP requests
+│   │   │   │   │   │   └── Commands.java   # Controller class to handle intput command  requests
 │   │   │   │   │   ├── domain
 │   │   │   │   │   │   ├── Matches.java    # Domain class for Matches
 │   │   │   │   │   │   └── Player.java     # Domain class for Player
@@ -42,7 +42,7 @@ dbprog
 │   │   │   │   │   │       ├── ...           # Other command implementations
 │   │   │   │   │   │       └── Factory.java  # Factory class for creating command instances
 │   │   │   │   │   ├── service
-│   │   │   │   │   │   └── Service.java     # Service layer with business logic
+│   │   │   │   │   │   └── Service.java     # Service layer with sql statement
 │   │   │   │   │   └── util
 │   │   │   │   │       └── JdbcUtils.java   # Utility class for JDBC operations
 │   │   ├── resources
