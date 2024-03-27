@@ -18,8 +18,9 @@ This application is designed to manage a database of players and their match rec
 - Maven 4.0.0
 - [Any other prerequisites]
 
-## Structure
-```plaintext
+# Structure
+
+```
 dbprog
 ├── .gitignore                              # Specifies intentionally untracked files to ignore
 ├── pom.xml                                 # Maven project file, containing dependencies and build configuration
@@ -48,8 +49,9 @@ dbprog
 │   │   │   └── db.properties                # Properties file with database configuration
 │   └── target                              # Compiled output directory with class files
 └── bun.lockb                               # No direct equivalent in Maven projects, lock file for dependencies
+```
 
-### Installation
+## Installation
 
 1. Clone the repository to your local machine:
    ```
@@ -68,7 +70,7 @@ dbprog
    mvn package
    ```
 
-### Running the Application
+## Running the Application
 
 To run the application, execute the following command, replacing `[csv_file_path]` with the path to your CSV file containing commands:
 
@@ -90,8 +92,8 @@ The application supports the following commands read from the CSV file:
 - A: List the win-loss record of a player against other players.
 - D: List all matches within a specified date range in chronological order.
 - M：return the matches by a certain player (regardless of whether it has been played), listed in chronological order. Subsequent fields contain.
-### CSV File Format
 
+### CSV File Format
 The first field of each line in the CSV file specifies the command, followed by the necessary parameters for that command. The format of the parameters varies based on the command.
 
 
