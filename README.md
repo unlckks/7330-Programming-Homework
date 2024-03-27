@@ -20,33 +20,33 @@ This application is designed to manage a database of players and their match rec
 
 ## Structure
 dbprog
-├── .gitignore # Specifies intentionally untracked files to ignore
-├── pom.xml # Maven project file, containing dependencies and build configuration
-├── README.md # This file with project description and documentation
-├── src # Source files directory
-│ ├── main
-│ │ ├── java
-│ │ │ ├── com
-│ │ │ │ ├── smu
-│ │ │ │ │ ├── controller
-│ │ │ │ │ │ └── Commands.java # Controller class to handle HTTP requests
-│ │ │ │ │ ├── domain
-│ │ │ │ │ │ ├── Matches.java # Domain class for Matches
-│ │ │ │ │ │ └── Player.java # Domain class for Player
-│ │ │ │ │ ├── factory
-│ │ │ │ │ │ └── impl
-│ │ │ │ │ │ ├── ACommand.java # Factory implementation for A type commands
-│ │ │ │ │ │ ├── CCommand.java # Factory implementation for C type commands
-│ │ │ │ │ │ ├── ... # Other command implementations
-│ │ │ │ │ │ └── Factory.java # Factory class for creating command instances
-│ │ │ │ │ ├── service
-│ │ │ │ │ │ └── Service.java # Service layer with business logic
-│ │ │ │ │ └── util
-│ │ │ │ │ └── JdbcUtils.java # Utility class for JDBC operations
-│ │ ├── resources
-│ │ │ └── db.properties # Properties file with database configuration
-│ └── target # Compiled output directory with class files
-└── bun.lockb # No direct equivalent in Maven projects, lock file for dependencies 
+├── .gitignore                              # Specifies intentionally untracked files to ignore
+├── pom.xml                                 # Maven project file, containing dependencies and build configuration
+├── README.md                               # This file with project description and documentation
+├── src                                     # Source files directory
+│   ├── main
+│   │   ├── java
+│   │   │   ├── com
+│   │   │   │   ├── smu
+│   │   │   │   │   ├── controller
+│   │   │   │   │   │   └── Commands.java   # Controller class to handle HTTP requests
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── Matches.java    # Domain class for Matches
+│   │   │   │   │   │   └── Player.java     # Domain class for Player
+│   │   │   │   │   ├── factory
+│   │   │   │   │   │   └── impl
+│   │   │   │   │   │       ├── ACommand.java # Factory implementation for A type commands
+│   │   │   │   │   │       ├── CCommand.java # Factory implementation for C type commands
+│   │   │   │   │   │       ├── ...           # Other command implementations
+│   │   │   │   │   │       └── Factory.java  # Factory class for creating command instances
+│   │   │   │   │   ├── service
+│   │   │   │   │   │   └── Service.java     # Service layer with business logic
+│   │   │   │   │   └── util
+│   │   │   │   │       └── JdbcUtils.java   # Utility class for JDBC operations
+│   │   ├── resources
+│   │   │   └── db.properties                # Properties file with database configuration
+│   └── target                              # Compiled output directory with class files
+└── bun.lockb                               # No direct equivalent in Maven projects, lock file for dependencies
 
 ### Installation
 
