@@ -19,6 +19,7 @@ This application is designed to manage a database of players and their match rec
 - [Any other prerequisites]
 
 ## Structure
+```plaintext
 dbprog
 ├── .gitignore                              # Specifies intentionally untracked files to ignore
 ├── pom.xml                                 # Maven project file, containing dependencies and build configuration
