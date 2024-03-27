@@ -6,7 +6,7 @@ This application is designed to manage a database of players and their match rec
 
 ## Technology Stack
 
--Language: Java
+- Language: Java
 - Build Tool: Maven
 - Database: Mysql
 
