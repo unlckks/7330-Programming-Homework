@@ -22,11 +22,11 @@ This application is designed to manage a database of players and their match rec
 
 1. Clone the repository to your local machine:
    ```
-   git clone [[repository URL]](https://github.com/unlckks/dbprog.git)
+   git clone https://github.com/unlckks/dbprog.git
    ```
 2. Navigate to the project directory:
    ```
-   cd [[project directory]](https://github.com/unlckks/dbprog.git)
+   cd https://github.com/unlckks/dbprog.git
    ```
 3. Use Maven to compile the project:
    ```
