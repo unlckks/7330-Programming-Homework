@@ -42,7 +42,7 @@ This application is designed to manage a database of players and their match rec
 To run the application, execute the following command, replacing `[csv_file_path]` with the path to your CSV file containing commands:
 
 ```
-   run main
+    run main
 ```
 
 ## Application Commands
