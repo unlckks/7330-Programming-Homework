@@ -4,6 +4,10 @@ import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
+/**
+ * @Author: MingYun
+ * @Date: 2024-02-28 17:20
+ */
 public class JdbcUtils {
 
     private static String driver=null;

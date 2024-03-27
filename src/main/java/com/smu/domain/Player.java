@@ -17,12 +17,13 @@ import java.util.Map;
 @NoArgsConstructor
 public class Player {
 
-        private String id;
+        private Integer id;
 
         private String name;
 
         private LocalDate birthdate;
 
+        private  Integer rating ;
 
         private String state;
 
