@@ -18,6 +18,35 @@ This application is designed to manage a database of players and their match rec
 - Maven 4.0.0
 - [Any other prerequisites]
 
+dbprog
+├── .gitignore
+├── pom.xml                              # Maven project file, containing dependencies and build configuration
+├── README.md
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   ├── com
+│   │   │   │   ├── smu
+│   │   │   │   │   ├── controller
+│   │   │   │   │   │   └── Commands.java      # Controller class, handle HTTP requests
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── Matches.java       # Domain class for matches
+│   │   │   │   │   │   └── Player.java        # Domain class for player
+│   │   │   │   │   ├── factory
+│   │   │   │   │   │   └── impl
+│   │   │   │   │   │       ├── ACommand.java  # Factory implementation classes for commands
+│   │   │   │   │   │       ├── CCommand.java
+│   │   │   │   │   │       ├── ...            # Other command classes
+│   │   │   │   │   │       └── Factory.java   # Factory class to create instances
+│   │   │   │   │   ├── service
+│   │   │   │   │   │   └── Service.java       # Service layer, business logic
+│   │   │   │   │   └── util
+│   │   │   │   │       └── JdbcUtils.java     # Utility class for JDBC operations
+│   │   ├── resources
+│   │   │   └── db.properties                  # Database configuration properties
+│   └── target                                # Compiled output directory, contains the compiled class files
+└── bun.lockb                                 # No equivalent, possibly a lock file for Maven dependencies
+
 ### Installation
 
 1. Clone the repository to your local machine:
