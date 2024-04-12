@@ -2,7 +2,7 @@
 
 ## Overview
 
-This application is designed to manage a database of players and their match records through a variety of data manipulation and query commands. The program reads commands from a CSV file and performs operations such as creating tables, adding new players, recording match results, and querying player information and match histories.
+This Application is designed to manage a database of players and their match records through a variety of data manipulation and query commands. The program reads commands from a CSV file and performs operations such as creating tables, adding new players, recording match results, and querying player information and match histories.
 
 ## Technology Stack
 
