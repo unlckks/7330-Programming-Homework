@@ -1,24 +1,23 @@
-# 7330 Programming Homework
+# ⚔️ 7330 Programming Homework
 
-## Overview
+## 📖 Overview
 
-This Application is designed to manage a database of players and their match records through a variety of data manipulation and query commands. The program reads commands from a CSV file and performs operations such as creating tables, adding new players, recording match results, and querying player information and match histories.
+This application is designed to manage a database of players and their match records through a variety of data manipulation and query commands. It reads commands from a CSV file and performs operations such as creating tables, adding new players, recording match results, and querying player information and match histories.
 
-## Technology Stack
+## 💻 Technology Stack
 
-- Language: Java
-- Build Tool: Maven
-- Database: Mysql
+- **Language**: Java
+- **Build Tool**: Maven
+- **Database**: MySQL
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
 
 - Java JDK 21
 - Maven 4.0.0
 
-
-# Structure
+## 🏗️ Project Structure
 
 ```
 dbprog
@@ -51,7 +50,7 @@ dbprog
 └── bun.lockb                               # No direct equivalent in Maven projects, lock file for dependencies
 ```
 
-## Installation
+## 📦 Installation
 
 1. Clone the repository to your local machine:
    ```
@@ -70,7 +69,7 @@ dbprog
    mvn package
    ```
 
-## Running the Application
+## ▶️ Running the Application
 
 To run the application, execute the following command, replacing `[csv_file_path]` with the path to your CSV file containing commands:
 
@@ -78,7 +77,7 @@ To run the application, execute the following command, replacing `[csv_file_path
     run main
 ```
 
-## Application Commands
+## 💼 Application Commands
 
 The application supports the following commands read from the CSV file:
 
@@ -93,7 +92,7 @@ The application supports the following commands read from the CSV file:
 - D: List all matches within a specified date range in chronological order.
 - M：return the matches by a certain player (regardless of whether it has been played), listed in chronological order. Subsequent fields contain.
 
-### CSV File Format
+### 🗂️ CSV File Format
 The first field of each line in the CSV file specifies the command, followed by the necessary parameters for that command. The format of the parameters varies based on the command.
 
 
